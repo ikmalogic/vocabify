@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabify | Generator Flashcard Arab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-amiri { font-family: 'Amiri', serif; }
+        .font-brand { font-family: 'Cinzel', serif; }
+
+        /* --- TEMA Glassmorphic --- */
+        :root {
+            --bg-primary: #1C1C1E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8E8E93;
+            --accent-color: #0A84FF;
+            --accent-pink: #5856D6; /* Changed for a different vibe */
+            --glass-bg: rgba(44, 44, 46, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --btn-secondary-bg: #3A3A3C;
+            --bg-tertiary: #2C2C2E;
+            --disclaimer-bg: rgba(255, 59, 48, 0.15);
+            --disclaimer-border: rgba(255, 59, 48, 0.3);
+            --disclaimer-text: #FF453A;
+            --btn-accent-bg: linear-gradient(to right, var(--accent-color), var(--accent-pink));
+            --btn-accent-orange-bg: linear-gradient(to right, #F97316, #FB923C);
+            --font-size-base: 16px;
+        }
+
+        .light-theme {
+            --bg-primary: #F2F2F7;
+            --text-primary: #000000;
+            --text-secondary: #636366;
+            --accent-color: #007AFF;
+            --accent-pink: #5856D6;
+            --glass-bg: rgba(249, 249, 251, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --btn-secondary-bg: #E5E5EA;
+            --bg-tertiary: #FFFFFF;
+            --disclaimer-bg: rgba(255, 59, 48, 0.1);
+            --disclaimer-border: rgba(255, 59, 48, 0.2);
+            --disclaimer-text: #C62828;
+            --btn-accent-orange-bg: linear-gradient(to right, #FB923C, #FDBA74);
+        }
+
+        html { font-size: var(--font-size-base); }
+        .bg-primary { background-color: var(--bg-primary); }
+        .bg-tertiary { background-color: var(--bg-tertiary); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-accent { color: var(--accent-color); }
+        .border-custom { border-color: var(--glass-border); }
+        
+        .brand-gradient {
+            background: linear-gradient(45deg, var(--accent-color), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        body, .main-card, button, .glass-card {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+        }
+
+        #background-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; }
+        #blob1 { width: 400px; height: 400px; top: -15%; left: -15%; background: var(--accent-color); }
+        #blob2 { width: 350px; height: 350px; bottom: -10%; right: -10%; background: var(--accent-pink); }
+
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+        }
+        
+        .professional-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem; background-color: var(--bg-tertiary);
+            color: var(--text-secondary); font-size: 0.75rem; font-weight: 500; padding: 0.25rem 0.75rem;
+            border-radius: 9999px; border: 1px solid var(--glass-border); transition: all 0.2s ease;
+        }
+        .professional-badge:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #48484A; border-radius: 10px; }
+
+        #device-preview-container {
+            transition: width 0.5s ease, height 0.5s ease, border-radius 0.5s ease, box-shadow 0.5s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden; border: 8px solid #000; background-color: var(--bg-primary);
+        }
+        #content-container { overflow-y: auto; }
+        .pc-view { width: 100%; height: 85vh; border-radius: 1rem; }
+        .tablet-view { width: 768px; height: 1024px; max-width: 100%; max-height: 85vh; border-radius: 1.5rem; }
+        .mobile-view { width: 375px; height: 667px; max-width: 100%; max-height: 85vh; border-radius: 2rem; }
+
+        .collapsible-header { cursor: pointer; user-select: none; }
+        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+        .collapsible-icon { transition: transform 0.3s ease-in-out; }
+        .collapsible-header.active .collapsible-icon { transform: rotate(180deg); }
+
+        .feature-toggle { color: var(--text-secondary); background-color: var(--btn-secondary-bg); }
+        .feature-toggle.active { background-color: rgba(10, 132, 255, 0.2); color: var(--accent-color); }
+        .light-theme .feature-toggle.active { background-color: rgba(0, 122, 255, 0.1); }
+
+        .disclaimer-badge {
+            background-color: var(--disclaimer-bg); border: 1px solid var(--disclaimer-border); color: var(--disclaimer-text);
+            font-size: 0.75rem; border-radius: 0.5rem; padding: 0.75rem; display: flex; align-items: flex-start; gap: 0.75rem;
+        }
+        
+        #sidebar-menu { transition: transform 0.3s ease-in-out; transform: translateX(100%); }
+        #sidebar-overlay { transition: opacity 0.3s ease-in-out; opacity: 0; pointer-events: none; }
+        body.sidebar-open #sidebar-menu { transform: translateX(0); }
+        body.sidebar-open #sidebar-overlay { opacity: 0.5; pointer-events: auto; }
+
+        #main-app-content { transition: filter 0.3s ease-in-out, transform 0.3s ease-in-out; }
+        body.sidebar-open #main-app-content {
+            filter: blur(4px) brightness(0.6); transform: scale(0.99); pointer-events: none; user-select: none;
+        }
+
+        /* --- Premium Flashcard Styles --- */
+        .flashcard-container { 
+            perspective: 1500px;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .flashcard-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .flashcard {
+            width: 100%;
+            display: grid;
+            transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-radius: 1rem;
+        }
+        .flashcard-container:hover .flashcard {
+             box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+        }
+        .flashcard.flipped { transform: rotateY(180deg); }
+
+        .flashcard-face {
+            grid-area: 1 / 1;
+            min-height: 12rem;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: 1rem; padding: 1.75rem;
+            overflow-y: auto;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .flashcard-face::-webkit-scrollbar { width: 5px; }
+        .flashcard-face::-webkit-scrollbar-track { background: transparent; }
+        .flashcard-face::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .light-theme .flashcard-face::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); }
+        
+        .flashcard-front {
+            background-image: linear-gradient(45deg, var(--bg-tertiary), var(--glass-bg));
+            border: 1px solid var(--glass-border);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+        .flashcard-back {
+            background-image: linear-gradient(135deg, var(--accent-color), var(--accent-pink));
+            transform: rotateY(180deg);
+        }
+        .arabic-vocab { font-size: 2rem; line-height: 1.4; }
+        .flashcard-back .arabic-vocab { font-size: 1.5rem; }
+        .arabic-sentence { font-size: 1.125rem; line-height: 1.6; }
+        .rtl { direction: rtl; text-align: right; }
+        .ltr { direction: ltr; text-align: left; }
+
+        .input-wrapper { position: relative; }
+        #clear-input-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            color: var(--text-secondary); display: none;
+        }
+        .input-wrapper.ltr #clear-input-btn { right: 0.75rem; }
+        .input-wrapper.rtl #clear-input-btn { left: 0.75rem; }
+
+        input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; background: transparent; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            height: 1rem; width: 1rem; background: var(--accent-color); border-radius: 50%; cursor: pointer; margin-top: -6px;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: var(--btn-secondary-bg); border-radius: 2px;
+        }
+
+        .item-checkbox {
+            /* position: absolute; NO LONGER NEEDED HERE */
+            /* top: 1rem; */
+            /* left: 1rem; */
+            /* z-index: 10; */
+            accent-color: var(--accent-color);
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .card-controls {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .speaker-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .speaker-btn:hover { opacity: 1; }
+        .speaker-btn.loading svg { animation: spin 1s linear infinite; }
+    </style>
+</head>
+<body class="bg-primary text-primary">
+    <div id="background-blobs">
+        <div id="blob1" class="blob"></div>
+        <div id="blob2" class="blob"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-card sticky top-0 z-50 py-2 px-4 sm:px-6 md:px-8 border-b border-custom">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <!-- Kiri: Tombol Tampilan Konten -->
+            <div class="flex-1 flex items-center justify-start gap-2">
+                <button id="toggle-tts" class="feature-toggle p-2 rounded-full hover:bg-tertiary transition duration-300" title="Aktifkan Suara (Memerlukan Kunci API Pribadi)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                </button>
+                <button id="toggle-harakat" class="feature-toggle p-2 rounded-full hover:bg-tertiary transition duration-300 active" title="Tampilkan Harakat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
+                </button>
+                <button id="toggle-transliterasi" class="feature-toggle p-2 rounded-full hover:bg-tertiary transition duration-300 active" title="Tampilkan Transliterasi">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5-7 5 7"/><path d="M7 10h6"/><path d="M12 19l3-3-3-3"/><path d="M15 16H3"/></svg>
+                </button>
+                <button id="toggle-terjemahan" class="feature-toggle p-2 rounded-full hover:bg-tertiary transition duration-300 active" title="Tampilkan Terjemahan">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h7" /><path d="M9 3v2c0 4.418 -2.239 8 -5 8" /><path d="M5 9c0 2.144 2.952 3.908 6.7 4" /><path d="M12 20l4 -9l4 9" /><path d="M19.1 18h-6.2" /></svg>
+                </button>
+            </div>
+            
+            <!-- Kanan: Tombol Kontrol Aplikasi -->
+            <div class="flex items-center justify-end gap-2">
+                <button id="device-toggle" class="p-2 rounded-full text-primary bg-btn-secondary-bg hover:bg-tertiary transition" title="Ganti Tampilan Perangkat">
+                    <svg id="icon-mobile" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    <svg id="icon-tablet" class="hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    <svg id="icon-pc" class="hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </button>
+                <button id="theme-toggle" class="p-2 rounded-full text-primary bg-btn-secondary-bg hover:bg-tertiary transition" title="Ganti Mode Terang/Gelap">
+                    <svg id="theme-icon-light" class="hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <button id="settings-btn" class="p-2 rounded-full text-primary bg-btn-secondary-bg hover:bg-tertiary transition" title="Pengaturan">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-app-content" class="p-4 sm:p-6 md:p-10 flex justify-center items-start min-h-[90vh]">
+        <div id="device-preview-container" class="mobile-view mx-auto main-card border-custom flex flex-col">
+            <div id="content-container" class="flex-grow p-4 sm:p-6 space-y-6">
+                <!-- App Content Here -->
+                <header class="text-center">
+                    <h1 class="font-brand brand-gradient text-4xl sm:text-5xl font-bold tracking-wider">VOCABIFY</h1>
+                    <p class="text-secondary -mt-1 sm:mt-0 text-sm">Generator Flashcard Bahasa Arab</p>
+                    <div class="mt-4">
+                         <a href="https://www.threads.net/@ikmalogic" target="_blank" rel="noopener noreferrer" class="professional-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-accent" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zM13.354 8.354a.5.5 0 00-.708-.708L9 11.293 7.354 9.646a.5.5 0 10-.708.708l2 2a.5.5 0 00.708 0l4-4z" clip-rule="evenodd" /></svg>
+                            by @ikmalogic
+                        </a>
+                    </div>
+                </header>
+
+                <!-- CARD 1: Input -->
+                <div class="glass-card rounded-xl shadow-lg">
+                    <div class="collapsible-header active p-4 sm:p-5 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-accent">1. Buat Kosakata</h2>
+                        <svg class="collapsible-icon h-6 w-6 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="p-4 sm:p-5 pt-0 space-y-4">
+                            <div>
+                                <label for="output-type" class="block mb-2 text-sm font-medium text-primary">Jenis Keluaran</label>
+                                <select id="output-type" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:ring-2 focus:ring-accent">
+                                    <option value="flashcard">Flashcard</option>
+                                    <option value="sinonim">Sinonim</option>
+                                    <option value="antonim">Antonim</option>
+                                    <option value="ina-ar">Terjemahan INA -> AR</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="topic-input" class="block mb-2 text-sm font-medium text-primary">Kata Kunci / Topik</label>
+                                <div id="input-wrapper" class="input-wrapper">
+                                    <textarea id="topic-input" rows="3" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:ring-2 focus:ring-accent" placeholder="Contoh: buah-buahan, di bandara, teknologi..."></textarea>
+                                    <button id="clear-input-btn" title="Hapus input">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                                    </button>
+                                </div>
+                                <div class="mt-2 grid grid-cols-3 gap-2">
+                                    <button id="upload-image-btn" class="flex-1 flex items-center justify-center gap-2 py-2 px-2 text-xs font-semibold bg-btn-secondary-bg text-primary rounded-lg hover:bg-opacity-80 transition" title="Unggah Gambar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+                                    </button>
+                                    <button id="use-camera-btn" class="flex-1 flex items-center justify-center gap-2 py-2 px-2 text-xs font-semibold bg-btn-secondary-bg text-primary rounded-lg hover:bg-opacity-80 transition" title="Ambil Foto">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                    </button>
+                                     <button id="paste-btn" class="flex-1 flex items-center justify-center gap-2 py-2 px-2 text-xs font-semibold bg-btn-secondary-bg text-primary rounded-lg hover:bg-opacity-80 transition" title="Tempel dari Clipboard">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                    </button>
+                                </div>
+                                <input type="file" id="image-upload-input" class="hidden" accept="image/*">
+                                <input type="file" id="camera-input" class="hidden" accept="image/*" capture="environment">
+                            </div>
+                            <div>
+                                <label for="language-style" class="block my-2 text-sm font-medium text-primary">Gaya Bahasa</label>
+                                <select id="language-style" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:ring-2 focus:ring-accent">
+                                    <option value="Fusha">Fusha (Formal)</option>
+                                    <option value="Amiyah Mesir">Amiyah Mesir</option>
+                                    <option value="Amiyah Teluk (Khaliji)">Amiyah Teluk (Khaliji)</option>
+                                    <option value="Amiyah Levant (Syami)">Amiyah Levant (Syami)</option>
+                                </select>
+                            </div>
+                            <button id="generate-btn" class="mt-4 w-full text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1" style="background-image: var(--btn-accent-bg);">
+                                Hasilkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 2: Hasil Flashcards -->
+                <div class="glass-card rounded-xl shadow-lg">
+                    <div class="collapsible-header p-4 sm:p-5 flex justify-between items-center">
+                        <h2 id="result-card-title" class="text-lg font-bold text-accent">2. Hasil</h2>
+                        <svg class="collapsible-icon h-6 w-6 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+                    <div class="collapsible-content">
+                        <div id="result-output" class="p-4 sm:p-5 pt-0 space-y-3">
+                            <div class="bg-tertiary p-4 rounded-lg min-h-[150px] flex items-center justify-center">
+                                <p class="text-secondary text-center">Hasil akan muncul di sini.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 3: Riwayat Tersimpan -->
+                <div class="glass-card rounded-xl shadow-lg">
+                    <div class="collapsible-header p-4 sm:p-5 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-accent">3. Kosakata Tersimpan</h2>
+                        <svg class="collapsible-icon h-6 w-6 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+                    <div class="collapsible-content">
+                         <div id="history-output" class="p-4 sm:p-5 pt-0 space-y-3">
+                            <p class="text-center text-secondary text-sm p-4">Belum ada riwayat.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="pt-2">
+                    <div class="disclaimer-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <p><strong>Penting:</strong> Hasil dari aplikasi ini dibuat oleh AI. Selalu lakukan pemeriksaan silang dengan ahli bahasa atau guru terpercaya.</p>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black z-40"></div>
+    <div id="sidebar-menu" class="fixed top-0 right-0 h-full w-80 max-w-[90%] glass-card shadow-lg z-50 p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-accent">Pengaturan</h2>
+            <button id="close-sidebar-btn" class="p-2 rounded-full hover:bg-tertiary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+        <div class="flex-grow overflow-y-auto pr-2 space-y-6 text-sm">
+            <!-- Pengaturan Kunci API -->
+            <div>
+                <h3 class="font-semibold text-primary mb-2">Kunci API Google AI</h3>
+                <p id="api-key-info" class="text-secondary text-xs mb-2">Gunakan kunci API pribadi untuk prioritas. Kunci bawaan akan dihapus permanen jika diganti.</p>
+                <div class="flex items-center gap-2">
+                    <input type="password" id="api-key-input" class="w-full bg-tertiary border border-custom rounded-lg p-2 text-primary focus:ring-2 focus:ring-accent" readonly>
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                     <button id="change-api-key-btn" class="flex-1 text-xs bg-btn-secondary-bg py-2 rounded-lg">Ganti</button>
+                     <button id="save-api-key-btn" class="flex-1 text-xs bg-accent text-white py-2 rounded-lg hidden">Simpan</button>
+                </div>
+                <p id="api-key-status" class="text-xs text-secondary mt-2"></p>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="mt-1 inline-block text-xs text-accent hover:underline">Belum punya kunci? &rarr;</a>
+            </div>
+            <!-- Pengaturan Ukuran Font -->
+            <div>
+                 <h3 class="font-semibold text-primary mb-2">Ukuran Font</h3>
+                 <div class="flex items-center gap-4 bg-tertiary p-2 rounded-lg border border-custom">
+                     <span class="text-xs text-secondary">Kecil</span>
+                     <input type="range" id="font-size-slider" min="12" max="20" value="16" class="w-full">
+                     <span class="text-xs text-secondary">Besar</span>
+                 </div>
+            </div>
+            <!-- Panduan Pengguna -->
+            <div>
+                <h3 class="font-semibold text-primary mb-2">Panduan Pengguna</h3>
+                <div class="text-secondary text-xs space-y-2 bg-tertiary p-3 rounded-lg border border-custom">
+                    <p>1. Isi <strong>Topik</strong>, unggah gambar, atau gunakan kamera.</p>
+                    <p>2. Klik <strong>Buat Flashcards</strong> untuk memulai.</p>
+                    <p>3. Klik kartu untuk melihat artinya (<strong>Flip</strong>).</p>
+                    <p>4. Centang kosakata yang ingin disimpan, lalu klik <strong>Simpan Pilihan</strong>.</p>
+                    <p>5. Gunakan tombol di header atas untuk mengatur tampilan hasil.</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-xs text-secondary pt-4">
+            VOCABIFY v1.0
+        </div>
+    </div>
+    
+    <div id="snackbar" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-5 py-2 rounded-lg shadow-lg text-sm z-50"></div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Element Selectors ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIconLight = document.getElementById('theme-icon-light');
+    const themeIconDark = document.getElementById('theme-icon-dark');
+    const deviceToggleBtn = document.getElementById('device-toggle');
+    const devicePreview = document.getElementById('device-preview-container');
+    const deviceIcons = { 'mobile-view': document.getElementById('icon-mobile'), 'tablet-view': document.getElementById('icon-tablet'), 'pc-view': document.getElementById('icon-pc') };
+    const settingsBtn = document.getElementById('settings-btn');
+    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const generateBtn = document.getElementById('generate-btn');
+    const resultOutput = document.getElementById('result-output');
+    const historyOutput = document.getElementById('history-output');
+    const snackbar = document.getElementById('snackbar');
+    const topicInput = document.getElementById('topic-input');
+    const outputTypeSelect = document.getElementById('output-type');
+    const resultCardTitle = document.getElementById('result-card-title');
+    const inputWrapper = document.getElementById('input-wrapper');
+    const clearInputBtn = document.getElementById('clear-input-btn');
+    const uploadImageBtn = document.getElementById('upload-image-btn');
+    const useCameraBtn = document.getElementById('use-camera-btn');
+    const pasteBtn = document.getElementById('paste-btn');
+    const imageUploadInput = document.getElementById('image-upload-input');
+    const cameraInput = document.getElementById('camera-input');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const saveApiKeyBtn = document.getElementById('save-api-key-btn');
+    const changeApiKeyBtn = document.getElementById('change-api-key-btn');
+    const apiKeyStatus = document.getElementById('api-key-status');
+    const apiKeyInfo = document.getElementById('api-key-info');
+    const fontSizeSlider = document.getElementById('font-size-slider');
+
+    const toggleTtsBtn = document.getElementById('toggle-tts');
+    const toggleHarakat = document.getElementById('toggle-harakat');
+    const toggleTransliterasi = document.getElementById('toggle-transliterasi');
+    const toggleTerjemahan = document.getElementById('toggle-terjemahan');
+
+    // --- State Variables ---
+    let currentResults = null;
+    let snackbarTimeout;
+    let isTtsActive = false;
+    let displayOptions = { harakat: true, transliterasi: true, terjemahan: true };
+    const defaultApiKeys = [ "AIzaSyAFCpagVtR6siVUolW_QBxKK6RRBD-G_iQ", "AIzaSyDfuNlkyQUu8BXbgmBWtQHI046VCP6m_ks", "AIzaSyAWm7C1e4-1AomKO1D65z_vSkMfBjEet68", "AIzaSyA87j3bLH17kjoXVGjP77kdDrhR3yBtE3M", "AIzaSyCr9cE8J5tWHwuhxt4Vl7SY9WxrUw9zb6Q", "AIzaSyAtjQRFQDM8AfleINaKpk46EsNUJLEewC0", "AIzaSyDWpb4qXQACpcTVinpUVNl8W_vXVTduoNY", "AIzaSyDeiAM2uetWuGE7nfWp9gRAwBK0QLJ8uc4", "AIzaSyAo8mABsAZEcKBwMAwTOVvy52wMA83fAmU", "AIzaSyAg9n9GGXDfxrUsLxhzjJWQZbCU_ZWownE", "AIzaSyCVx6nzZ-JFfJ2QvEE4nugFT-bqL8yUINs", "AIzaSyAHpuxQNjRYi6FJmdhB0c2JmOOiz5Bs9Jw", "AIzaSyCEGgeTGYPYuPFZ6fU2XFwL4uxEyr1AbGM", "AIzaSyBIXIMpaOYVfpFZ4B1x0Li5qEr4z5ze9X4", "AIzaSyB-LqCIjIEuY1VzzdtcV78fcR0UISSYZEE", "AIzaSyD78UgT9gGdGUbp4aa9ee416xIwoFiMhZk", "AIzaSyBYjjQLVKerfMVAVG9aqjBoQA4t69Je8eE", "AIzaSyBUTzjSdKbtXjGVt0A31NF7cETxdla8r9U", "AIzaSyAEKvF8j561Bs1T1iQqjWSI6VgGncPRHY0", "AIzaSyBQ9T267n_b8qqQapOzBvoKnz_BHhOroo0", "AIzaSyAlbaYJiEWXH5Ik2wUZkegrQJKAkFWBNYg", "AIzaSyDWFUrQcYIP2P324zpP7lGu5YFRvWd3utQ", "AIzaSyCqbF-X_vn7gsnsbokWzNaKieIOcEfHE4w", "AIzaSyDAt9y7xyFJ8BWssugnOKsJgAiDuJ9tq4Y", "AIzaSyCiCZidbMaQGDvikW4t9c488gat1StSBrE", "AIzaSyBcHv6j1PfGSszWchvYqu7zX6Cmle2O8hc", "AIzaSyDhPV377NXGOAb89YR7hXpqUqzcMHsFxEk", "AIzaSyASYEswnH042mv9h7Dh7HEruLuksdWpDBY", "AIzaSyCcLwekn4mUrpj6OnQOhSWXCSF7JlnB9DM", "AIzaSyD0CIh_slu9gvckw2f0Elbg_Z8xuLyx7tE"];
+
+    // --- Utility Functions ---
+    const showSnackbar = (message) => {
+        snackbar.textContent = message;
+        snackbar.classList.remove('hidden');
+        clearTimeout(snackbarTimeout);
+        snackbarTimeout = setTimeout(() => snackbar.classList.add('hidden'), 3000);
+    };
+
+    const updateCollapsibleContent = (container, html) => {
+        container.innerHTML = html;
+        const contentWrapper = container.parentElement;
+        if (contentWrapper && contentWrapper.classList.contains('collapsible-content') && contentWrapper.previousElementSibling.classList.contains('active')) {
+            setTimeout(() => {
+                contentWrapper.style.maxHeight = contentWrapper.scrollHeight + 'px';
+            }, 50);
+        }
+    };
+
+    const fileToBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+    });
+    
+    // --- Theme & Device Management ---
+    const applyTheme = (theme) => {
+        document.body.classList.toggle('light-theme', theme === 'light');
+        themeIconLight.classList.toggle('hidden', theme !== 'light');
+        themeIconDark.classList.toggle('hidden', theme === 'light');
+    };
+    
+    const deviceStates = ['mobile-view', 'tablet-view', 'pc-view'];
+    let currentDeviceIndex = 0;
+    const applyDeviceView = (index) => {
+        deviceStates.forEach(state => devicePreview.classList.remove(state));
+        Object.values(deviceIcons).forEach(icon => icon.classList.add('hidden'));
+        const newDeviceState = deviceStates[index];
+        devicePreview.classList.add(newDeviceState);
+        deviceIcons[newDeviceState].classList.remove('hidden');
+        currentDeviceIndex = index;
+    };
+
+    // --- Sidebar Management ---
+    const toggleSidebar = (open) => document.body.classList.toggle('sidebar-open', open);
+
+    // --- API Key Management ---
+    const loadAndDisplayApiKey = () => {
+        const userKey = localStorage.getItem('user_api_key');
+        const defaultKeyRemoved = localStorage.getItem('default_key_removed') === 'true';
+        apiKeyInfo.textContent = 'Gunakan kunci API pribadi untuk prioritas. Kunci bawaan akan dihapus permanen jika diganti.';
+        if (userKey) {
+            apiKeyInput.value = userKey;
+            apiKeyInput.readOnly = true;
+            apiKeyStatus.textContent = `Kunci pribadi aktif (berakhir ...${userKey.slice(-4)}).`;
+            saveApiKeyBtn.classList.add('hidden');
+            changeApiKeyBtn.classList.remove('hidden');
+        } else if (defaultKeyRemoved) {
+            apiKeyInput.value = '';
+            apiKeyInput.readOnly = false;
+            apiKeyInput.placeholder = 'Kunci API pribadi wajib diisi';
+            apiKeyStatus.textContent = 'Kunci bawaan telah dihapus.';
+            saveApiKeyBtn.classList.remove('hidden');
+            changeApiKeyBtn.classList.add('hidden');
+        } else {
+            apiKeyInput.value = '●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●';
+            apiKeyInput.readOnly = true;
+            apiKeyStatus.textContent = 'Menggunakan kunci API bawaan sistem.';
+            saveApiKeyBtn.classList.add('hidden');
+            changeApiKeyBtn.classList.remove('hidden');
+        }
+    };
+    
+    const getApiKey = (requireUserKey = false) => {
+        const userKey = localStorage.getItem('user_api_key');
+        if (userKey) return [userKey];
+        if (requireUserKey) return [];
+        if (localStorage.getItem('default_key_removed') === 'true') return [];
+        return defaultApiKeys;
+    };
+
+    // --- Font Size Management ---
+    const applyFontSize = (size) => {
+        document.documentElement.style.setProperty('--font-size-base', `${size}px`);
+        localStorage.setItem('font-size', size);
+    };
+
+    // --- Core Application Logic ---
+    const handleImageInput = async (file) => {
+        if (!file) return;
+        const keys = getApiKey();
+        if (keys.length === 0) {
+            showSnackbar('Kunci API tidak tersedia. Silakan masukkan di pengaturan.');
+            toggleSidebar(true);
+            return;
+        }
+        topicInput.value = 'Menganalisis gambar...';
+        topicInput.disabled = true;
+        generateBtn.disabled = true;
+        try {
+            const base64Data = await fileToBase64(file);
+            const payload = { contents: [{ parts: [{ text: "Analyze this image. If it contains legible text (either Arabic or Indonesian), return only that extracted text. If it does not contain text, identify the main objects or scene and return a concise description in Indonesian (e.g., 'sepeda', 'pemandangan gunung berkabut saat fajar'). Do not add any introductory phrases like 'Tidak ada teks yang ditemukan'." }, { inlineData: { mimeType: file.type, data: base64Data } }] }] };
+            let responseData = null;
+            for (const key of keys) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${key}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (response.ok) { responseData = await response.json(); break; }
+                } catch (error) { console.error(`Error with key ...${key.slice(-4)}:`, error); }
+            }
+            if (responseData && responseData.candidates) {
+                topicInput.value = responseData.candidates[0].content.parts[0].text;
+                showSnackbar('Gambar berhasil dianalisis.');
+            } else { throw new Error('Gagal menganalisis gambar.'); }
+        } catch (error) {
+            console.error("Image analysis error:", error);
+            showSnackbar('Gagal menganalisis gambar. Coba lagi.');
+            topicInput.value = '';
+        } finally {
+            topicInput.disabled = false;
+            generateBtn.disabled = false;
+            topicInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    };
+    
+    const generateOutput = async () => {
+        const topic = topicInput.value.trim();
+        if (!topic) {
+            showSnackbar('Topik tidak boleh kosong.');
+            return;
+        }
+        const keys = getApiKey();
+        if (keys.length === 0) {
+            showSnackbar('Kunci API tidak tersedia.');
+            toggleSidebar(true);
+            return;
+        }
+
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Memproses...`;
+        const loadingHtml = `<div class="bg-tertiary p-6 rounded-lg min-h-[150px] flex flex-col items-center justify-center text-center"><svg class="animate-spin h-8 w-8 text-accent mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><p class="text-primary font-semibold">Sabar, sedang diproses...</p><p class="text-sm mt-2 text-secondary">Sembari menunggu, mari manfaatkan waktu ini untuk berdzikir.</p></div>`;
+        updateCollapsibleContent(resultOutput, loadingHtml);
+
+        const resultHeader = resultOutput.closest('.glass-card').querySelector('.collapsible-header');
+        if (!resultHeader.classList.contains('active')) resultHeader.click();
+
+        const languageStyle = document.getElementById('language-style').value;
+        const outputType = outputTypeSelect.value;
+        
+        let systemPrompt = '';
+        let userPrompt = `Topik/Kata Kunci: ${topic}\nGaya Bahasa: ${languageStyle}`;
+        
+        switch (outputType) {
+            case 'sinonim':
+                resultCardTitle.textContent = "2. Hasil Sinonim";
+                systemPrompt = `Anda adalah ahli kamus bahasa Arab. Tugas Anda adalah menemukan 5 sinonim (muradif) dari kata kunci yang diberikan. Untuk setiap sinonim, berikan contoh kalimat sederhana. PENTING: Semua teks Arab yang dihasilkan WAJIB menyertakan harakat yang lengkap dan akurat. Struktur output WAJIB dalam format JSON berikut: {"output_type": "sinonim", "main_word": {"arabic": "...", "transliteration": "...", "translation": "..."}, "results": [{"arabic": "...", "transliteration": "...", "translation": "...", "example_sentence_arabic": "...", "example_sentence_transliteration": "...", "example_sentence_translation": "..."}, ...]}`;
+                break;
+            case 'antonim':
+                resultCardTitle.textContent = "2. Hasil Antonim";
+                systemPrompt = `Anda adalah ahli kamus bahasa Arab. Tugas Anda adalah menemukan 5 antonim (dhidd) dari kata kunci yang diberikan. Untuk setiap antonim, berikan contoh kalimat sederhana. PENTING: Semua teks Arab yang dihasilkan WAJIB menyertakan harakat yang lengkap dan akurat. Struktur output WAJIB dalam format JSON berikut: {"output_type": "antonim", "main_word": {"arabic": "...", "transliteration": "...", "translation": "..."}, "results": [{"arabic": "...", "transliteration": "...", "translation": "...", "example_sentence_arabic": "...", "example_sentence_transliteration": "...", "example_sentence_translation": "..."}, ...]}`;
+                break;
+            case 'ina-ar':
+                 resultCardTitle.textContent = "2. Hasil Terjemahan";
+                 userPrompt = `Kata/Frasa Indonesia: ${topic}\nGaya Bahasa: ${languageStyle}`;
+                 systemPrompt = `Anda adalah penerjemah ahli Indonesia-Arab. Terjemahkan kata atau frasa yang diberikan ke dalam bahasa Arab, berikan beberapa alternatif jika memungkinkan. PENTING: Semua teks Arab yang dihasilkan WAJIB menyertakan harakat yang lengkap dan akurat. Struktur output WAJIB dalam format JSON berikut: {"output_type": "ina-ar", "source_phrase": "...", "translations": [{"arabic": "...", "transliteration": "...", "context": "..."}, ...]}`;
+                break;
+            case 'flashcard':
+            default:
+                resultCardTitle.textContent = "2. Hasil Flashcards";
+                systemPrompt = `Anda adalah seorang ahli bahasa Arab. Tugas Anda adalah membuat 5 kosakata (mufradat) dalam bentuk flashcard berdasarkan topik yang diberikan pengguna.
+
+Instruksi:
+1.  Buat 5 kosakata yang relevan dengan topik.
+2.  Gunakan gaya bahasa (lahjah) yang diminta: ${languageStyle}.
+3.  Setiap kosakata harus memiliki harakat yang lengkap dan akurat.
+4.  Untuk setiap kosakata, sediakan:
+    a. Teks Arab dengan harakat lengkap ('arabic_word').
+    b. Transliterasi fonetik sederhana ke huruf Latin ('transliteration').
+    c. Terjemahan yang akurat ke dalam bahasa Indonesia ('indonesian_translation').
+    d. Contoh kalimat sederhana dalam bahasa Arab menggunakan kosakata tersebut, lengkap dengan harakat ('example_sentence_arabic').
+    e. Transliterasi untuk contoh kalimat ('example_sentence_transliteration').
+    f. Terjemahan contoh kalimat ke bahasa Indonesia ('example_sentence_translation').
+
+Struktur output WAJIB dalam format JSON berikut. JANGAN tambahkan teks lain di luar JSON.
+{
+  "output_type": "flashcard",
+  "flashcards": [
+    {
+      "arabic_word": "...",
+      "transliteration": "...",
+      "indonesian_translation": "...",
+      "example_sentence_arabic": "...",
+      "example_sentence_transliteration": "...",
+      "example_sentence_translation": "..."
+    }
+  ]
+}`;
+                break;
+        }
+
+        const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json" } };
+        
+        let responseData = null;
+        for (const key of keys) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${key}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (response.ok) { 
+                    try {
+                        const jsonResponse = await response.json();
+                        if (jsonResponse.candidates) {
+                            responseData = jsonResponse;
+                            break; 
+                        }
+                    } catch(e) {
+                         console.error(`Failed to parse JSON from response (key: ...${key.slice(-4)})`, e);
+                    }
+                } else if (response.status === 429) { 
+                    console.warn(`API key ...${key.slice(-4)} limit reached.`);
+                } else {
+                    console.warn(`API key ...${key.slice(-4)} failed with status: ${response.status}`);
+                }
+            } catch (error) { 
+                console.error(`Network error for key ...${key.slice(-4)}:`, error);
+            }
+        }
+
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Hasilkan';
+        
+        if (responseData && responseData.candidates) {
+            try {
+                let rawText = responseData.candidates[0].content.parts[0].text;
+                rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const startIndex = rawText.indexOf('{');
+                const endIndex = rawText.lastIndexOf('}');
+                if (startIndex === -1 || endIndex === -1) {
+                    throw new Error("No valid JSON object found in the AI response.");
+                }
+                const jsonString = rawText.substring(startIndex, endIndex + 1);
+                const resultData = JSON.parse(jsonString);
+
+                currentResults = resultData;
+                const type = resultData.output_type || outputType;
+
+                switch (type) {
+                    case 'sinonim':
+                    case 'antonim':
+                        renderSynonymAntonym(resultData, resultOutput);
+                        break;
+                    case 'ina-ar':
+                        renderTranslation(resultData, resultOutput);
+                        break;
+                    case 'flashcard':
+                    default:
+                        renderFlashcards(resultData, resultOutput);
+                        break;
+                }
+                showSnackbar('Hasil berhasil dibuat!');
+            } catch (e) {
+                console.error("JSON Parsing Error:", e, responseData.candidates[0].content.parts[0].text);
+                updateCollapsibleContent(resultOutput, `<div class="bg-tertiary p-4 rounded-lg"><p class="text-red-400">Gagal memproses respons dari AI. Coba lagi.</p></div>`);
+            }
+        } else {
+            updateCollapsibleContent(resultOutput, `<div class="bg-tertiary p-4 rounded-lg"><p class="text-red-400">Terjadi kesalahan. Coba lagi nanti atau masukkan kunci API pribadi.</p></div>`);
+        }
+    };
+
+    // --- Rendering Functions ---
+    const renderFlashcards = (data, container) => {
+        if (!data || !data.flashcards || data.flashcards.length === 0) {
+            updateCollapsibleContent(container, '<p class="text-secondary">Data flashcard tidak valid.</p>');
+            return;
+        }
+
+        const cardsHtml = data.flashcards.map((card, index) => {
+            const harakatText = card.arabic_word;
+            const noHarakatText = harakatText.replace(/[\u064B-\u065F]/g, '');
+            const harakatSentence = card.example_sentence_arabic;
+            const noHarakatSentence = harakatSentence.replace(/[\u064B-\u065F]/g, '');
+            const sentenceTransliteration = card.example_sentence_transliteration || '';
+
+            return `
+            <div class="flashcard-container">
+                <div class="flashcard">
+                    <div class="flashcard-face flashcard-front">
+                        <div class="card-controls">
+                            <input type="checkbox" title="Pilih item ini" class="item-checkbox" data-index="${index}">
+                        </div>
+                        <p class="font-amiri arabic-vocab rtl" data-harakat="${harakatText}" data-no-harakat="${noHarakatText}">${displayOptions.harakat ? harakatText : noHarakatText}</p>
+                    </div>
+                    <div class="flashcard-face flashcard-back text-white text-center">
+                        <div class="card-controls">
+                            <input type="checkbox" title="Pilih item ini" class="item-checkbox" data-index="${index}">
+                            <button class="speaker-btn text-white" data-text="${harakatText}" style="${isTtsActive ? '' : 'display:none;'}" title="Dengarkan Kata"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                        </div>
+                        <div class="flex flex-col items-center w-full">
+                            <p class="font-amiri text-lg rtl" data-harakat="${harakatText}" data-no-harakat="${noHarakatText}">${displayOptions.harakat ? harakatText : noHarakatText}</p>
+                            <p class="text-xs italic ltr" data-transliteration>${card.transliteration}</p>
+                            <p class="font-bold text-sm mt-1 ltr" data-translation>${card.indonesian_translation}</p>
+                            
+                            <hr class="w-1/2 my-3 border-white/30">
+
+                            <div class="flex items-center gap-2">
+                                <p class="font-amiri rtl arabic-sentence" data-harakat-sentence="${harakatSentence}" data-no-harakat-sentence="${noHarakatSentence}">${displayOptions.harakat ? harakatSentence : noHarakatSentence}</p>
+                                <button class="speaker-btn text-white" data-text="${harakatSentence}" style="${isTtsActive ? '' : 'display:none;'}" title="Dengarkan Kalimat"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                            </div>
+                            <p class="text-xs italic mt-1 ltr" data-sentence-transliteration>${sentenceTransliteration}</p>
+                            <p class="text-xs mt-1 ltr" data-sentence-translation>"${card.example_sentence_translation}"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        const actionButtons = `
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button id="save-all-btn" class="text-sm text-white py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px" style="background-image: var(--btn-accent-orange-bg);">Simpan Semua</button>
+                <button id="copy-all-btn" class="text-sm bg-btn-secondary-bg text-primary py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px">Salin Semua</button>
+                <button id="save-selection-btn" class="text-sm text-white py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px" style="background-image: var(--btn-accent-orange-bg);">Simpan Pilihan</button>
+                <button id="copy-selection-btn" class="text-sm bg-btn-secondary-bg text-primary py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px">Salin Pilihan</button>
+            </div>`;
+        
+        updateCollapsibleContent(container, `${actionButtons}<div class="space-y-4">${cardsHtml}</div>`);
+    };
+
+    const renderSynonymAntonym = (data, container) => {
+        const mainWord = data.main_word;
+        const results = data.results;
+        if (!mainWord || !results) {
+             updateCollapsibleContent(container, '<p class="text-secondary">Data tidak valid.</p>');
+             return;
+        }
+
+        const actionButtons = `
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button id="save-all-btn" class="text-sm text-white py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px" style="background-image: var(--btn-accent-orange-bg);">Simpan Semua</button>
+                <button id="copy-all-btn" class="text-sm bg-btn-secondary-bg text-primary py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px">Salin Semua</button>
+                <button id="save-selection-btn" class="text-sm text-white py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px" style="background-image: var(--btn-accent-orange-bg);">Simpan Pilihan</button>
+                <button id="copy-selection-btn" class="text-sm bg-btn-secondary-bg text-primary py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px">Salin Pilihan</button>
+            </div>`;
+
+        const mainWordHtml = `
+            <div class="text-center mb-4 pb-4 border-b border-custom">
+                <p class="text-secondary text-sm">Kata Kunci:</p>
+                <p class="font-amiri text-2xl rtl" data-harakat="${mainWord.arabic}" data-no-harakat="${mainWord.arabic.replace(/[\u064B-\u065F]/g, '')}">${displayOptions.harakat ? mainWord.arabic : mainWord.arabic.replace(/[\u064B-\u065F]/g, '')}</p>
+                <p class="text-sm italic" data-transliteration ${!displayOptions.transliterasi ? 'style="display:none;"' : ''}>${mainWord.transliteration}</p>
+                <p class="text-sm" data-translation ${!displayOptions.terjemahan ? 'style="display:none;"' : ''}>${mainWord.translation}</p>
+            </div>
+        `;
+
+        const resultsHtml = results.map((item, index) => {
+            const harakatSentence = item.example_sentence_arabic || '';
+            const noHarakatSentence = harakatSentence.replace(/[\u064B-\u065F]/g, '');
+            const sentenceTransliteration = item.example_sentence_transliteration || '';
+            const sentenceTranslation = item.example_sentence_translation || '';
+
+            return `
+            <div class="relative bg-tertiary p-3 rounded-lg border border-custom">
+                <div class="card-controls">
+                    <input type="checkbox" title="Pilih item ini" class="item-checkbox" data-index="${index}">
+                    <button class="speaker-btn text-primary" data-text="${item.arabic}" style="${isTtsActive ? '' : 'display:none;'}" title="Dengarkan Kata"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                </div>
+                 <div class="pl-12">
+                     <p class="font-amiri text-xl rtl" data-harakat="${item.arabic}" data-no-harakat="${item.arabic.replace(/[\u064B-\u065F]/g, '')}">${displayOptions.harakat ? item.arabic : item.arabic.replace(/[\u064B-\u065F]/g, '')}</p>
+                     <p class="text-xs italic" data-transliteration ${!displayOptions.transliterasi ? 'style="display:none;"' : ''}>${item.transliteration}</p>
+                     <p class="text-xs" data-translation ${!displayOptions.terjemahan ? 'style="display:none;"' : ''}>${item.translation}</p>
+                     
+                     <hr class="my-2 border-custom/50" ${!harakatSentence ? 'style="display:none;"' : ''}>
+                     
+                     <div class="text-xs" ${!harakatSentence ? 'style="display:none;"' : ''}>
+                        <div class="flex items-center gap-2">
+                            <p class="font-amiri rtl arabic-sentence" data-harakat-sentence="${harakatSentence}" data-no-harakat-sentence="${noHarakatSentence}">${displayOptions.harakat ? harakatSentence : noHarakatSentence}</p>
+                            <button class="speaker-btn text-primary" data-text="${harakatSentence}" style="${isTtsActive ? '' : 'display:none;'}" title="Dengarkan Kalimat"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                        </div>
+                        <p class="italic" data-sentence-transliteration ${!displayOptions.transliterasi ? 'style="display:none;"' : ''}>${sentenceTransliteration}</p>
+                        <p data-sentence-translation ${!displayOptions.terjemahan ? 'style="display:none;"' : ''}>"${sentenceTranslation}"</p>
+                     </div>
+                 </div>
+            </div>
+        `}).join('');
+
+        const finalHtml = `${actionButtons}${mainWordHtml}<div class="space-y-3">${resultsHtml}</div>`;
+        updateCollapsibleContent(container, finalHtml);
+    };
+    
+    const renderTranslation = (data, container) => {
+        const sourcePhrase = data.source_phrase;
+        const translations = data.translations;
+        if (!sourcePhrase || !translations) {
+             updateCollapsibleContent(container, '<p class="text-secondary">Data tidak valid.</p>');
+             return;
+        }
+        
+        const actionButtons = `
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button id="save-all-btn" class="text-sm text-white py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px" style="background-image: var(--btn-accent-orange-bg);">Simpan Semua</button>
+                <button id="copy-all-btn" class="text-sm bg-btn-secondary-bg text-primary py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px">Salin Semua</button>
+                <button id="save-selection-btn" class="text-sm text-white py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px" style="background-image: var(--btn-accent-orange-bg);">Simpan Pilihan</button>
+                <button id="copy-selection-btn" class="text-sm bg-btn-secondary-bg text-primary py-2 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px">Salin Pilihan</button>
+            </div>`;
+
+        const mainWordHtml = `
+            <div class="text-center mb-4 pb-4 border-b border-custom">
+                <p class="text-secondary text-sm">Kata/Frasa Indonesia:</p>
+                <p class="font-bold text-xl">${sourcePhrase}</p>
+            </div>
+        `;
+
+        const resultsHtml = translations.map((item, index) => `
+            <div class="relative bg-tertiary p-3 rounded-lg border border-custom">
+                <div class="card-controls">
+                    <input type="checkbox" title="Pilih item ini" class="item-checkbox" data-index="${index}">
+                    <button class="speaker-btn text-primary" data-text="${item.arabic}" style="${isTtsActive ? '' : 'display:none;'}" title="Dengarkan Kata"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                </div>
+                 <div class="pl-12">
+                     <p class="font-amiri text-xl rtl" data-harakat="${item.arabic}" data-no-harakat="${item.arabic.replace(/[\u064B-\u065F]/g, '')}">${displayOptions.harakat ? item.arabic : item.arabic.replace(/[\u064B-\u065F]/g, '')}</p>
+                     <p class="text-xs italic" data-transliteration ${!displayOptions.transliterasi ? 'style="display:none;"' : ''}>${item.transliteration}</p>
+                     <p class="text-xs mt-2" data-translation ${!displayOptions.terjemahan ? 'style="display:none;"' : ''}><span class="font-semibold">Konteks:</span> ${item.context}</p>
+                 </div>
+            </div>
+        `).join('');
+
+        const finalHtml = `${actionButtons}${mainWordHtml}<div class="space-y-3">${resultsHtml}</div>`;
+        updateCollapsibleContent(container, finalHtml);
+    };
+
+    const updateRenderedViews = () => {
+        document.querySelectorAll('.flashcard-container, .history-item, #result-output').forEach(el => {
+            // Harakat
+            el.querySelectorAll('[data-harakat]').forEach(p => { p.textContent = displayOptions.harakat ? p.dataset.harakat : p.dataset.noHarakat; });
+            el.querySelectorAll('[data-harakat-sentence]').forEach(p => { p.textContent = displayOptions.harakat ? p.dataset.harakatSentence : p.dataset.noHarakatSentence; });
+            // Transliteration & Translation
+            el.querySelectorAll('[data-transliteration], [data-sentence-transliteration]').forEach(p => p.style.display = displayOptions.transliterasi ? '' : 'none');
+            el.querySelectorAll('[data-translation], [data-sentence-translation]').forEach(p => p.style.display = displayOptions.terjemahan ? '' : 'none');
+        });
+        updateSpeakerIconsVisibility();
+    };
+
+    const updateSpeakerIconsVisibility = () => {
+        document.querySelectorAll('.speaker-btn').forEach(btn => {
+            btn.style.display = isTtsActive ? '' : 'none';
+        });
+    };
+
+    const renderHistory = () => {
+        const history = getHistory();
+        const historyKeys = Object.keys(history);
+        if (historyKeys.length === 0 || historyKeys.every(key => history[key].length === 0)) {
+            updateCollapsibleContent(historyOutput, '<p class="text-center text-secondary text-sm p-4">Belum ada riwayat.</p>');
+            return;
+        }
+
+        const typeDisplayNames = {
+            flashcard: "Riwayat Flashcard",
+            sinonim: "Riwayat Sinonim",
+            antonim: "Riwayat Antonim",
+            "ina-ar": "Riwayat Terjemahan"
+        };
+        
+        const historyHtml = historyKeys.map(type => {
+            if (history[type].length === 0) return '';
+
+            const itemsHtml = history[type].map(item => {
+                const harakatText = item.arabic_word;
+                const noHarakatText = harakatText.replace(/[\u064B-\u065F]/g, '');
+                const harakatSentence = item.example_sentence_arabic;
+                const noHarakatSentence = harakatSentence.replace(/[\u064B-\u065F]/g, '');
+                const sentenceTransliteration = item.example_sentence_transliteration || '';
+    
+                return `
+                <div class="history-item flex items-center gap-3">
+                    <div class="flex-grow flashcard-container">
+                        <div class="flashcard" data-id="${item.id}" data-type="${type}">
+                            <div class="flashcard-face flashcard-front">
+                                <p class="font-amiri arabic-vocab rtl" data-harakat="${harakatText}" data-no-harakat="${noHarakatText}">${displayOptions.harakat ? harakatText : noHarakatText}</p>
+                            </div>
+                            <div class="flashcard-face flashcard-back text-white text-center">
+                                <div class="card-controls">
+                                     <button class="speaker-btn text-white" data-text="${harakatText}" style="${isTtsActive ? '' : 'display:none;'}" title="Dengarkan Kata"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                                </div>
+                                <div class="flex flex-col items-center w-full">
+                                    <p class="font-amiri text-lg rtl" data-harakat="${harakatText}" data-no-harakat="${noHarakatText}">${displayOptions.harakat ? harakatText : noHarakatText}</p>
+                                    <p class="text-xs italic ltr" data-transliteration>${item.transliteration}</p>
+                                    <p class="font-bold text-sm mt-1 ltr" data-translation>${item.indonesian_translation}</p>
+                                    
+                                    <hr class="w-1/2 my-3 border-white/30">
+    
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-amiri rtl arabic-sentence" data-harakat-sentence="${harakatSentence}" data-no-harakat-sentence="${noHarakatSentence}">${displayOptions.harakat ? harakatSentence : noHarakatSentence}</p>
+                                         <button class="speaker-btn text-white" data-text="${harakatSentence}" style="${isTtsActive ? '' : 'display:none;'}" title="Dengarkan Kalimat"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                                    </div>
+                                    <p class="text-xs italic mt-1 ltr" data-sentence-transliteration>${sentenceTransliteration}</p>
+                                    <p class="text-xs mt-1 ltr" data-sentence-translation>"${item.example_sentence_translation}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 flex-shrink-0">
+                        <button class="copy-history-btn p-2 rounded-full bg-btn-secondary-bg text-primary hover:bg-tertiary transition" data-id="${item.id}" data-type="${type}" title="Salin">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pointer-events-none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        <button class="delete-history-btn p-2 rounded-full bg-btn-secondary-bg text-primary hover:bg-tertiary transition" data-id="${item.id}" data-type="${type}" title="Hapus">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pointer-events-none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="glass-card rounded-lg">
+                    <div class="collapsible-header-history p-3 flex justify-between items-center cursor-pointer">
+                        <h3 class="text-sm font-semibold text-primary">${typeDisplayNames[type] || 'Lainnya'}</h3>
+                        <svg class="collapsible-icon h-5 w-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="p-3 pt-0 space-y-4">${itemsHtml}</div>
+                    </div>
+                </div>
+            `;
+
+        }).join('');
+
+        updateCollapsibleContent(historyOutput, `<div class="space-y-3">${historyHtml}</div>`);
+        
+        // Attach listeners to new collapsible headers
+        document.querySelectorAll('.collapsible-header-history').forEach(header => {
+            header.addEventListener('click', () => {
+                header.classList.toggle('active');
+                const content = header.nextElementSibling;
+                content.style.maxHeight = header.classList.contains('active') ? content.scrollHeight + 'px' : '0px';
+            });
+        });
+    };
+
+    // --- History & Copy/Paste Management ---
+    const getHistory = () => JSON.parse(localStorage.getItem('vocabify_history') || '{}');
+    const saveHistory = (history) => localStorage.setItem('vocabify_history', JSON.stringify(history));
+
+    const copyToClipboard = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.top = "-9999px";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showSnackbar('Berhasil disalin!');
+        } catch (err) {
+            console.error('Gagal menyalin:', err);
+            showSnackbar('Gagal menyalin.');
+        }
+        document.body.removeChild(textArea);
+    };
+
+    const generateCopyTextForItem = (item, type, sourcePhrase = '') => {
+        let parts = [];
+        let exampleParts = [];
+        let finalString = '';
+
+        const arabicWord = displayOptions.harakat ? (item.arabic_word || item.arabic) : (item.arabic_word || item.arabic).replace(/[\u064B-\u065F]/g, '');
+        parts.push(arabicWord);
+
+        if (displayOptions.transliterasi && item.transliteration) {
+            parts.push(`(${item.transliteration})`);
+        }
+        if (displayOptions.terjemahan) {
+            const translation = item.indonesian_translation || item.translation || sourcePhrase;
+            parts.push(`: ${translation}`);
+        }
+        finalString = parts.join(' ');
+
+        if (item.example_sentence_arabic) {
+            const exampleSentence = displayOptions.harakat ? item.example_sentence_arabic : item.example_sentence_arabic.replace(/[\u064B-\u065F]/g, '');
+            exampleParts.push(`\nContoh: ${exampleSentence}`);
+
+            if (displayOptions.transliterasi && item.example_sentence_transliteration) {
+                exampleParts.push(`\n(${item.example_sentence_transliteration})`);
+            }
+            if (displayOptions.terjemahan && item.example_sentence_translation) {
+                exampleParts.push(`\nArtinya: "${item.example_sentence_translation}"`);
+            }
+            finalString += exampleParts.join('');
+        } else if (item.context) { // For ina-ar
+             if (displayOptions.terjemahan) {
+                finalString += `\nKonteks: ${item.context}`;
+             }
+        }
+        
+        return finalString;
+    };
+
+
+    // --- Event Listeners ---
+    themeToggleBtn.addEventListener('click', () => {
+        const newTheme = document.body.classList.toggle('light-theme') ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    });
+
+    deviceToggleBtn.addEventListener('click', () => applyDeviceView((currentDeviceIndex + 1) % deviceStates.length));
+    
+    settingsBtn.addEventListener('click', () => toggleSidebar(true));
+    closeSidebarBtn.addEventListener('click', () => toggleSidebar(false));
+    sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
+
+    changeApiKeyBtn.addEventListener('click', () => {
+        localStorage.setItem('default_key_removed', 'true');
+        localStorage.removeItem('user_api_key');
+        loadAndDisplayApiKey();
+        apiKeyInput.focus();
+    });
+
+    saveApiKeyBtn.addEventListener('click', () => {
+        const key = apiKeyInput.value.trim();
+        if (key && key.startsWith('AIzaSy')) {
+            localStorage.setItem('user_api_key', key);
+            showSnackbar('Kunci API berhasil disimpan.');
+            loadAndDisplayApiKey();
+        } else {
+            showSnackbar('Format kunci API tidak valid.');
+        }
+    });
+
+    document.querySelectorAll('.collapsible-header').forEach(header => {
+        header.addEventListener('click', () => {
+            header.classList.toggle('active');
+            const content = header.nextElementSibling;
+            content.style.maxHeight = header.classList.contains('active') ? content.scrollHeight + 'px' : '0px';
+        });
+        if (header.classList.contains('active')) {
+             setTimeout(() => { header.nextElementSibling.style.maxHeight = header.nextElementSibling.scrollHeight + 'px'; }, 100);
+        }
+    });
+
+    fontSizeSlider.addEventListener('input', (e) => applyFontSize(e.target.value));
+
+    generateBtn.addEventListener('click', generateOutput);
+    
+    // Input related events
+    uploadImageBtn.addEventListener('click', () => imageUploadInput.click());
+    useCameraBtn.addEventListener('click', () => cameraInput.click());
+    imageUploadInput.addEventListener('change', (e) => handleImageInput(e.target.files[0]));
+    cameraInput.addEventListener('change', (e) => handleImageInput(e.target.files[0]));
+
+    pasteBtn.addEventListener('click', () => {
+        topicInput.focus();
+        showSnackbar('Silakan tempel (paste) dengan Ctrl+V atau dari menu klik kanan.');
+    });
+
+    topicInput.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const clipboardData = e.clipboardData || window.clipboardData;
+        let isImagePasted = false;
+
+        if (clipboardData.files && clipboardData.files.length > 0) {
+            const file = clipboardData.files[0];
+            if (file.type.startsWith('image/')) {
+                handleImageInput(file);
+                isImagePasted = true;
+            }
+        }
+        
+        if (!isImagePasted) {
+            const pastedText = clipboardData.getData('text/plain');
+            if (pastedText) {
+                const start = topicInput.selectionStart;
+                const end = topicInput.selectionEnd;
+                const text = topicInput.value;
+                topicInput.value = text.substring(0, start) + pastedText + text.substring(end);
+                topicInput.selectionStart = topicInput.selectionEnd = start + pastedText.length;
+                showSnackbar('Teks berhasil ditempel.');
+                topicInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+    });
+
+
+    topicInput.addEventListener('input', () => {
+        const hasText = topicInput.value.length > 0;
+        clearInputBtn.style.display = hasText ? 'block' : 'none';
+        const isArabic = /[\u0600-\u06FF]/.test(topicInput.value);
+        inputWrapper.classList.toggle('rtl', isArabic);
+        inputWrapper.classList.toggle('ltr', !isArabic);
+    });
+
+    clearInputBtn.addEventListener('click', () => {
+        topicInput.value = '';
+        clearInputBtn.style.display = 'none';
+    });
+    
+    // Toggle button events
+    [toggleHarakat, toggleTransliterasi, toggleTerjemahan].forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.classList.toggle('active');
+            displayOptions.harakat = toggleHarakat.classList.contains('active');
+            displayOptions.transliterasi = toggleTransliterasi.classList.contains('active');
+            displayOptions.terjemahan = toggleTerjemahan.classList.contains('active');
+            updateRenderedViews();
+        });
+    });
+
+    // Result/History dynamic events
+    resultOutput.addEventListener('click', (e) => {
+        if (e.target.matches('.item-checkbox')) {
+            // Synchronize checkboxes for the same flashcard item
+            const checkbox = e.target;
+            const cardContainer = checkbox.closest('.flashcard-container');
+            if (cardContainer) {
+                const otherCheckbox = Array.from(cardContainer.querySelectorAll('.item-checkbox')).find(cb => cb !== checkbox);
+                if (otherCheckbox) {
+                    otherCheckbox.checked = checkbox.checked;
+                }
+            }
+            return; // Stop further processing to prevent card flip
+        }
+        
+        const flashcard = e.target.closest('.flashcard');
+        if (flashcard) {
+            flashcard.classList.toggle('flipped');
+            return;
+        }
+
+        const saveAllBtn = e.target.closest('#save-all-btn');
+        if (saveAllBtn) {
+            if (!currentResults) { return showSnackbar('Tidak ada item untuk disimpan.'); }
+            const dataArray = currentResults.flashcards || currentResults.results || currentResults.translations;
+            if (!dataArray || dataArray.length === 0) { return showSnackbar('Tidak ada item untuk disimpan.'); }
+            const allIndices = dataArray.map((_, index) => index);
+            saveItems(allIndices);
+            return;
+        }
+
+        const saveBtn = e.target.closest('#save-selection-btn');
+        if (saveBtn) {
+            const selectedIndices = Array.from(resultOutput.querySelectorAll('.item-checkbox:checked')).map(cb => parseInt(cb.dataset.index))
+                                       .filter((value, index, self) => self.indexOf(value) === index); // Get unique indices
+            if (selectedIndices.length === 0) { return showSnackbar('Pilih setidaknya satu item untuk disimpan.'); }
+            saveItems(selectedIndices);
+            return;
+        }
+
+        const copySelectionBtn = e.target.closest('#copy-selection-btn');
+        if (copySelectionBtn) {
+            const selectedIndices = Array.from(resultOutput.querySelectorAll('.item-checkbox:checked')).map(cb => parseInt(cb.dataset.index))
+                                       .filter((value, index, self) => self.indexOf(value) === index); // Get unique indices
+            
+            if (selectedIndices.length === 0 || !currentResults) { return showSnackbar('Pilih setidaknya satu item untuk disalin.'); }
+
+            let text = selectedIndices.map(index => {
+                const item = (currentResults.flashcards || currentResults.results || currentResults.translations)[index];
+                return generateCopyTextForItem(item, currentResults.output_type, currentResults.source_phrase);
+            }).join('\n\n');
+
+            let headerText = '';
+            if (currentResults.output_type === 'sinonim' || currentResults.output_type === 'antonim') {
+                headerText = `Kata Kunci: ${currentResults.main_word.arabic} (${currentResults.main_word.translation})\n\n`;
+            } else if (currentResults.output_type === 'ina-ar') {
+                headerText = `Indonesia: ${currentResults.source_phrase}\n\n`;
+            }
+
+            copyToClipboard(headerText + text);
+            return;
+        }
+
+        const copyAllBtn = e.target.closest('#copy-all-btn');
+        if (copyAllBtn && currentResults) {
+            const dataArray = currentResults.flashcards || currentResults.results || currentResults.translations;
+            let text = dataArray.map(item => {
+                return generateCopyTextForItem(item, currentResults.output_type, currentResults.source_phrase);
+            }).join('\n\n');
+
+            let headerText = '';
+            if (currentResults.output_type === 'sinonim' || currentResults.output_type === 'antonim') {
+                headerText = `Kata Kunci: ${currentResults.main_word.arabic} (${currentResults.main_word.translation})\n\n`;
+            } else if (currentResults.output_type === 'ina-ar') {
+                headerText = `Indonesia: ${currentResults.source_phrase}\n\n`;
+            }
+
+            copyToClipboard(headerText + text);
+        }
+    });
+
+    const saveItems = (indices) => {
+        const history = getHistory();
+        const outputType = currentResults.output_type;
+        if (!history[outputType]) {
+            history[outputType] = [];
+        }
+        let newItems = [];
+
+        switch(outputType) {
+            case 'flashcard':
+                newItems = indices.map(index => ({ ...currentResults.flashcards[index], id: Date.now() + index, type: 'flashcard' }));
+                break;
+            case 'sinonim':
+            case 'antonim':
+                newItems = indices.map(index => {
+                    const item = currentResults.results[index];
+                    return {
+                        id: Date.now() + index,
+                        type: outputType,
+                        arabic_word: item.arabic,
+                        transliteration: item.transliteration,
+                        indonesian_translation: item.translation,
+                        example_sentence_arabic: item.example_sentence_arabic || `Contoh untuk ${item.arabic}`,
+                        example_sentence_transliteration: item.example_sentence_transliteration || '',
+                        example_sentence_translation: item.example_sentence_translation || `Contoh untuk ${item.translation}`,
+                    };
+                });
+                break;
+            case 'ina-ar':
+                newItems = indices.map(index => {
+                    const item = currentResults.translations[index];
+                    return {
+                        id: Date.now() + index,
+                        type: 'ina-ar',
+                        arabic_word: item.arabic,
+                        transliteration: item.transliteration,
+                        indonesian_translation: currentResults.source_phrase,
+                        example_sentence_arabic: item.context,
+                        example_sentence_transliteration: '',
+                        example_sentence_translation: item.context,
+                    };
+                });
+                break;
+        }
+
+        history[outputType].push(...newItems);
+        saveHistory(history);
+        renderHistory();
+        showSnackbar(`${newItems.length} item berhasil disimpan.`);
+    };
+
+    historyOutput.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.delete-history-btn');
+        const copyBtn = e.target.closest('.copy-history-btn');
+        const flashcard = e.target.closest('.flashcard');
+
+        if (deleteBtn) {
+            const id = Number(deleteBtn.dataset.id);
+            const type = deleteBtn.dataset.type;
+            const history = getHistory();
+            if (history[type]) {
+                history[type] = history[type].filter(h => h.id !== id);
+                 if (history[type].length === 0) {
+                    delete history[type];
+                }
+                saveHistory(history);
+                renderHistory();
+                showSnackbar('Kosakata dihapus.');
+            }
+            return;
+        }
+        
+        if (copyBtn) {
+            const id = Number(copyBtn.dataset.id);
+            const type = copyBtn.dataset.type;
+            const history = getHistory();
+            const item = history[type] ? history[type].find(h => h.id === id) : null;
+
+            if(item) {
+                 const text = generateCopyTextForItem(item, 'flashcard');
+                 copyToClipboard(text);
+            }
+            return;
+        }
+
+        if (flashcard) {
+            flashcard.classList.toggle('flipped');
+        }
+    });
+
+    // --- TTS Logic ---
+    toggleTtsBtn.addEventListener('click', () => {
+        const userApiKey = localStorage.getItem('user_api_key');
+        if (!toggleTtsBtn.classList.contains('active') && !userApiKey) {
+            showSnackbar('Fitur suara memerlukan kunci API pribadi.');
+            apiKeyInfo.textContent = 'Fitur suara memerlukan kunci API pribadi Anda untuk dapat berfungsi.';
+            toggleSidebar(true);
+            return;
+        }
+        isTtsActive = !isTtsActive;
+        toggleTtsBtn.classList.toggle('active');
+        updateSpeakerIconsVisibility();
+    });
+
+    const playAudio = async (text, style, buttonEl) => {
+        const userApiKey = getApiKey(true)[0];
+        if (!userApiKey) {
+            showSnackbar('Kunci API pribadi tidak ditemukan.');
+            return;
+        }
+
+        buttonEl.innerHTML = `<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>`;
+        buttonEl.disabled = true;
+
+        let prompt;
+        switch(style) {
+            case 'Amiyah Mesir': prompt = `Say this in an Egyptian Arabic dialect: ${text}`; break;
+            case 'Amiyah Teluk (Khaliji)': prompt = `Say this in a Gulf (Khaliji) Arabic dialect: ${text}`; break;
+            case 'Amiyah Levant (Syami)': prompt = `Say this in a Levantine (Shami) Arabic dialect: ${text}`; break;
+            case 'Fusha':
+            default: prompt = `Say this in formal Arabic (Fusha): ${text}`; break;
+        }
+        
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${userApiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseModalities: ["AUDIO"] },
+                    model: "gemini-2.5-flash-preview-tts"
+                }),
+            });
+            if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+            
+            const result = await response.json();
+            const audioData = result?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+            if (!audioData) throw new Error('No audio data received.');
+
+            const pcmData = base64ToArrayBuffer(audioData);
+            const pcm16 = new Int16Array(pcmData);
+            const wavBlob = pcmToWav(pcm16, 24000); // Gemini TTS uses 24kHz sample rate
+            const audioUrl = URL.createObjectURL(wavBlob);
+            new Audio(audioUrl).play();
+
+        } catch (error) {
+            console.error("TTS Error:", error);
+            showSnackbar('Gagal memutar suara.');
+        } finally {
+            buttonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>`;
+            buttonEl.disabled = false;
+        }
+    };
+    
+    const base64ToArrayBuffer = (base64) => {
+        const binaryString = window.atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes.buffer;
+    };
+
+    const pcmToWav = (pcmData, sampleRate) => {
+        const numChannels = 1;
+        const bitsPerSample = 16;
+        const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+        const blockAlign = numChannels * (bitsPerSample / 8);
+        const dataSize = pcmData.length * (bitsPerSample / 8);
+        const buffer = new ArrayBuffer(44 + dataSize);
+        const view = new DataView(buffer);
+
+        // RIFF header
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + dataSize, true);
+        writeString(view, 8, 'WAVE');
+        // fmt chunk
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true); // PCM
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, byteRate, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitsPerSample, true);
+        // data chunk
+        writeString(view, 36, 'data');
+        view.setUint32(40, dataSize, true);
+        // PCM data
+        for (let i = 0; i < pcmData.length; i++) {
+            view.setInt16(44 + i * 2, pcmData[i], true);
+        }
+        return new Blob([view], { type: 'audio/wav' });
+    };
+
+    const writeString = (view, offset, string) => {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    };
+
+    const ttsEventListener = (e) => {
+        const speakerBtn = e.target.closest('.speaker-btn');
+        if (speakerBtn) {
+            const textToSpeak = speakerBtn.dataset.text;
+            const languageStyle = document.getElementById('language-style').value;
+            if (textToSpeak) {
+                playAudio(textToSpeak, languageStyle, speakerBtn);
+            }
+        }
+    };
+    resultOutput.addEventListener('click', ttsEventListener);
+    historyOutput.addEventListener('click', ttsEventListener);
+
+
+    // --- Initial Load ---
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+    applyDeviceView(0);
+    loadAndDisplayApiKey();
+    const savedFontSize = localStorage.getItem('font-size') || 16;
+    fontSizeSlider.value = savedFontSize;
+    applyFontSize(savedFontSize);
+    renderHistory();
+});
+</script>
+</body>
+</html>
+
