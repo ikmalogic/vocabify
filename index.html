@@ -96,9 +96,31 @@
             overflow: hidden; border: 8px solid #000; background-color: var(--bg-primary);
         }
         #content-container { overflow-y: auto; }
-        .pc-view { width: 100%; height: 85vh; border-radius: 1rem; }
-        .tablet-view { width: 768px; height: 1024px; max-width: 100%; max-height: 85vh; border-radius: 1.5rem; }
-        .mobile-view { width: 375px; height: 667px; max-width: 100%; max-height: 85vh; border-radius: 2rem; }
+        /* Ini adalah kelas-kelas untuk mengubah mode perangkat */
+        .pc-view { 
+            width: 100%; 
+            height: 85vh; 
+            border-radius: 1rem; /* Sudut melengkung untuk monitor PC */
+        }
+        .tablet-view { 
+            width: 768px; 
+            height: 1024px; 
+            max-width: 100%; 
+            max-height: 85vh; 
+            border-radius: 1.5rem; /* Sudut melengkung untuk Tablet/iPad */
+        }
+        .mobile-view { 
+            width: 375px; 
+            height: 667px; 
+            max-width: 100%; 
+            max-height: 85vh; 
+            border-radius: 2rem; /* Sudut lebih melengkung untuk HP */
+        }
+        /* BARU: Tampilan lanskap untuk seluler */
+        .mobile-view-landscape { width: 667px; height: 375px; max-width: 100%; max-height: 85vh; border-radius: 2rem; }
+        
+        /* BARU: Tampilan lanskap untuk tablet */
+        .tablet-view-landscape { width: 1024px; height: 768px; max-width: 100%; max-height: 85vh; border-radius: 1.5rem; }
 
         .collapsible-header { cursor: pointer; user-select: none; }
         .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
@@ -349,7 +371,7 @@
 
                 <!-- CARD 2: Hasil Flashcards -->
                 <div class="glass-card rounded-xl shadow-lg">
-                    <div class="collapsible-header p-4 sm:p-5 flex justify-between items-center">
+                    <div class="collapsible-header active p-4 sm:p-5 flex justify-between items-center">
                         <h2 id="result-card-title" class="text-lg font-bold text-accent">2. Hasil</h2>
                         <svg class="collapsible-icon h-6 w-6 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                     </div>
@@ -364,7 +386,7 @@
 
                 <!-- CARD 3: Riwayat Tersimpan -->
                 <div class="glass-card rounded-xl shadow-lg">
-                    <div class="collapsible-header p-4 sm:p-5 flex justify-between items-center">
+                    <div class="collapsible-header active p-4 sm:p-5 flex justify-between items-center">
                         <h2 class="text-lg font-bold text-accent">3. Kosakata Tersimpan</h2>
                         <svg class="collapsible-icon h-6 w-6 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                     </div>
@@ -478,6 +500,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleTransliterasi = document.getElementById('toggle-transliterasi');
     const toggleTerjemahan = document.getElementById('toggle-terjemahan');
 
+    // BARU: Mendeteksi kueri orientasi perangkat
+    const orientationQuery = window.matchMedia("(orientation: landscape)");
+
     // --- State Variables ---
     let currentResults = null;
     let snackbarTimeout;
@@ -519,14 +544,43 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const deviceStates = ['mobile-view', 'tablet-view', 'pc-view'];
     let currentDeviceIndex = 0;
+    
+    // FUNGSI DIMODIFIKASI: Menerapkan tampilan perangkat
     const applyDeviceView = (index) => {
-        deviceStates.forEach(state => devicePreview.classList.remove(state));
+        currentDeviceIndex = index; // Atur indeks perangkat saat ini
+
+        // Perbarui ikon
         Object.values(deviceIcons).forEach(icon => icon.classList.add('hidden'));
         const newDeviceState = deviceStates[index];
-        devicePreview.classList.add(newDeviceState);
         deviceIcons[newDeviceState].classList.remove('hidden');
-        currentDeviceIndex = index;
+        
+        // Panggil fungsi baru untuk menangani logika orientasi
+        handleOrientationChange(orientationQuery);
     };
+
+    // FUNGSI BARU: Menangani perubahan orientasi
+    const handleOrientationChange = (e) => {
+        const isLandscape = e.matches;
+        
+        // Hapus semua kelas tampilan terlebih dahulu
+        devicePreview.classList.remove(
+            'mobile-view', 'mobile-view-landscape', 
+            'tablet-view', 'tablet-view-landscape', 
+            'pc-view'
+        );
+
+        // Terapkan kelas yang benar berdasarkan indeks DAN orientasi
+        if (currentDeviceIndex === 0) { // Mode Seluler
+            devicePreview.classList.add(isLandscape ? 'mobile-view-landscape' : 'mobile-view');
+        } else if (currentDeviceIndex === 1) { // Mode Tablet
+            devicePreview.classList.add(isLandscape ? 'tablet-view-landscape' : 'tablet-view');
+        } else { // Mode PC
+            devicePreview.classList.add('pc-view');
+        }
+    };
+    
+    // BARU: Tambahkan listener untuk perubahan orientasi
+    orientationQuery.addEventListener('change', handleOrientationChange);
 
     // --- Sidebar Management ---
     const toggleSidebar = (open) => document.body.classList.toggle('sidebar-open', open);
@@ -639,11 +693,11 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (outputType) {
             case 'sinonim':
                 resultCardTitle.textContent = "2. Hasil Sinonim";
-                systemPrompt = `Anda adalah ahli kamus bahasa Arab. Tugas Anda adalah menemukan 5 sinonim (muradif) dari kata kunci yang diberikan. Untuk setiap sinonim, berikan contoh kalimat sederhana. PENTING: Semua teks Arab yang dihasilkan WAJIB menyertakan harakat yang lengkap dan akurat. Struktur output WAJIB dalam format JSON berikut: {"output_type": "sinonim", "main_word": {"arabic": "...", "transliteration": "...", "translation": "..."}, "results": [{"arabic": "...", "transliteration": "...", "translation": "...", "example_sentence_arabic": "...", "example_sentence_transliteration": "...", "example_sentence_translation": "..."}, ...]}`;
+                systemPrompt = `Anda adalah ahli kamus bahasa Arab. Tugas Anda adalah menemukan 5 sinonim (muradif) dari kata kunci yang diberikan. Untuk setiap sinonim, berikan contoh kalimat sederhana dan terjemahannya dalam Bahasa Indonesia. PENTING: Semua teks Arab yang dihasilkan WAJIB menyertakan harakat yang lengkap dan akurat. Semua kolom 'translation' dan 'example_sentence_translation' WAJIB dalam Bahasa Indonesia. Struktur output WAJIB dalam format JSON berikut: {"output_type": "sinonim", "main_word": {"arabic": "...", "transliteration": "...", "translation": "..."}, "results": [{"arabic": "...", "transliteration": "...", "translation": "...", "example_sentence_arabic": "...", "example_sentence_transliteration": "...", "example_sentence_translation": "..."}, ...]}`;
                 break;
             case 'antonim':
                 resultCardTitle.textContent = "2. Hasil Antonim";
-                systemPrompt = `Anda adalah ahli kamus bahasa Arab. Tugas Anda adalah menemukan 5 antonim (dhidd) dari kata kunci yang diberikan. Untuk setiap antonim, berikan contoh kalimat sederhana. PENTING: Semua teks Arab yang dihasilkan WAJIB menyertakan harakat yang lengkap dan akurat. Struktur output WAJIB dalam format JSON berikut: {"output_type": "antonim", "main_word": {"arabic": "...", "transliteration": "...", "translation": "..."}, "results": [{"arabic": "...", "transliteration": "...", "translation": "...", "example_sentence_arabic": "...", "example_sentence_transliteration": "...", "example_sentence_translation": "..."}, ...]}`;
+                systemPrompt = `Anda adalah ahli kamus bahasa Arab. Tugas Anda adalah menemukan 5 antonim (dhidd) dari kata kunci yang diberikan. Untuk setiap antonim, berikan contoh kalimat sederhana dan terjemahannya dalam Bahasa Indonesia. PENTING: Semua teks Arab yang dihasilkan WAJIB menyertakan harakat yang lengkap dan akurat. Semua kolom 'translation' dan 'example_sentence_translation' WAJIB dalam Bahasa Indonesia. Struktur output WAJIB dalam format JSON berikut: {"output_type": "antonim", "main_word": {"arabic": "...", "transliteration": "...", "translation": "..."}, "results": [{"arabic": "...", "transliteration": "...", "translation": "...", "example_sentence_arabic": "...", "example_sentence_transliteration": "...", "example_sentence_translation": "..."}, ...]}`;
                 break;
             case 'ina-ar':
                  resultCardTitle.textContent = "2. Hasil Terjemahan";
@@ -1115,10 +1169,26 @@ Struktur output WAJIB dalam format JSON berikut. JANGAN tambahkan teks lain di l
         header.addEventListener('click', () => {
             header.classList.toggle('active');
             const content = header.nextElementSibling;
-            content.style.maxHeight = header.classList.contains('active') ? content.scrollHeight + 'px' : '0px';
+            if (header.classList.contains('active')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                header.style.paddingBottom = ''; // Kembalikan padding default dari class
+                header.style.paddingTop = ''; // Kembalikan padding default dari class
+            } else {
+                content.style.maxHeight = '0px';
+                header.style.paddingBottom = '1rem'; // Atur padding-bottom seimbang (p-4)
+                header.style.paddingTop = '1rem'; // Atur padding-top seimbang (p-4)
+            }
         });
+
+        // Inisialisasi saat memuat
         if (header.classList.contains('active')) {
-             setTimeout(() => { header.nextElementSibling.style.maxHeight = header.nextElementSibling.scrollHeight + 'px'; }, 100);
+             setTimeout(() => { 
+                 header.nextElementSibling.style.maxHeight = header.nextElementSibling.scrollHeight + 'px'; 
+             }, 100);
+        } else {
+            // Jika mulai dalam keadaan tertutup, atur padding seimbang
+            header.style.paddingBottom = '1rem';
+            header.style.paddingTop = '1rem';
         }
     });
 
@@ -1499,4 +1569,9 @@ Struktur output WAJIB dalam format JSON berikut. JANGAN tambahkan teks lain di l
 </script>
 </body>
 </html>
+
+
+
+
+
 
