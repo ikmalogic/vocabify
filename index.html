@@ -15,39 +15,65 @@
         .font-amiri { font-family: 'Amiri', serif; }
         .font-brand { font-family: 'Cinzel', serif; }
 
-        /* --- TEMA Glassmorphic --- */
+        /* Variabel Tema untuk Dark (Default) & Light Mode - Diadopsi dari fahimna.my.id */
         :root {
-            --bg-primary: #1C1C1E;
-            --text-primary: #FFFFFF;
-            --text-secondary: #8E8E93;
-            --accent-color: #0A84FF;
-            --accent-pink: #5856D6; /* Changed for a different vibe */
-            --glass-bg: rgba(44, 44, 46, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --btn-secondary-bg: #3A3A3C;
-            --bg-tertiary: #2C2C2E;
-            --disclaimer-bg: rgba(255, 59, 48, 0.15);
-            --disclaimer-border: rgba(255, 59, 48, 0.3);
-            --disclaimer-text: #FF453A;
-            --btn-accent-bg: linear-gradient(to right, var(--accent-color), var(--accent-pink));
-            --btn-accent-orange-bg: linear-gradient(to right, #F97316, #FB923C);
+            --bg-primary: #0f172a; /* slate-900 - Latar belakang "dalam" aplikasi */
+            --bg-secondary: #1e293b; /* slate-800 - Latar belakang Kartu/Kontainer */
+            --bg-tertiary: #334155; /* slate-700 - Elemen di dalam kartu (input, tombol sekunder) */
+            --bg-header: rgba(15, 23, 42, 0.8); /* Latar belakang header semi-transparan */
+            --text-primary: #f1f5f9; /* slate-100 */
+            --text-secondary: #94a3b8; /* slate-400 */
+            --accent-color: #22d3ee; /* cyan-400 - Aksen Utama */
+            --border-color: #475569; /* slate-600 */
+            --scroll-thumb: #475569;
+            --scroll-track: transparent; /* Tetap transparan agar menyatu */
+            
+            /* Warna Tombol & Pemisah Baru */
+            --btn-accent-bg: linear-gradient(to right, #fb923c, #f59e0b); /* orange-400 to amber-500 (Tombol Generate) */
+            --btn-accent-orange-bg: linear-gradient(to right, #fb923c, #f59e0b); /* (Tombol Simpan) */
+            --btn-secondary-bg: #334155; /* slate-700 */
+            --btn-feature-active-bg: var(--bg-tertiary); /* Latar belakang tombol fitur aktif */
+            --btn-feature-active-text: var(--accent-color); /* Teks tombol fitur aktif */
+
+            /* Warna Disclaimer */
+            --disclaimer-bg: rgba(239, 68, 68, 0.1);
+            --disclaimer-border: rgba(239, 68, 68, 0.2);
+            --disclaimer-text: #f87171; /* red-400 */
+            --disclaimer-icon: #ef4444; /* red-500 */
+            --disclaimer-strong: #fca5a5; /* red-300 */
+            
+            --flashcard-back-bg: var(--bg-secondary); /* slate-800, lebih gelap dari depan (dark mode) */
+            
             --font-size-base: 16px;
         }
 
         .light-theme {
-            --bg-primary: #F2F2F7;
-            --text-primary: #000000;
-            --text-secondary: #636366;
-            --accent-color: #007AFF;
-            --accent-pink: #5856D6;
-            --glass-bg: rgba(249, 249, 251, 0.7);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --btn-secondary-bg: #E5E5EA;
-            --bg-tertiary: #FFFFFF;
-            --disclaimer-bg: rgba(255, 59, 48, 0.1);
-            --disclaimer-border: rgba(255, 59, 48, 0.2);
-            --disclaimer-text: #C62828;
-            --btn-accent-orange-bg: linear-gradient(to right, #FB923C, #FDBA74);
+            --bg-primary: #f1f5f9; /* slate-100 */
+            --bg-secondary: #ffffff; /* white */
+            --bg-tertiary: #f8fafc; /* slate-50 */
+            --bg-header: rgba(241, 245, 249, 0.8);
+            --text-primary: #0f172a; /* slate-900 */
+            --text-secondary: #475569; /* slate-600 */
+            --accent-color: #0891b2; /* cyan-600 */
+            --border-color: #e2e8f0; /* slate-200 */
+            --scroll-thumb: #cbd5e1;
+            --scroll-track: transparent;
+
+            /* Warna Tombol & Pemisah Baru */
+            --btn-accent-bg: linear-gradient(to right, #f97316, #ea580c); /* orange-500 to orange-600 */
+            --btn-accent-orange-bg: linear-gradient(to right, #f97316, #ea580c);
+            --btn-secondary-bg: #e2e8f0; /* slate-200 */
+            --btn-feature-active-bg: #e2e8f0; /* slate-200 */
+            --btn-feature-active-text: var(--accent-color);
+
+            /* Warna Disclaimer */
+            --disclaimer-bg: rgba(239, 68, 68, 0.1);
+            --disclaimer-border: rgba(220, 38, 38, 0.3);
+            --disclaimer-text: #b91c1c; /* red-800 */
+            --disclaimer-icon: #dc2626; /* red-600 */
+            --disclaimer-strong: #991b1b; /* red-900 */
+            
+            --flashcard-back-bg: var(--bg-primary); /* slate-100, lebih gelap dari depan (light mode) */
         }
 
         html { font-size: var(--font-size-base); }
@@ -56,46 +82,67 @@
         .text-primary { color: var(--text-primary); }
         .text-secondary { color: var(--text-secondary); }
         .text-accent { color: var(--accent-color); }
-        .border-custom { border-color: var(--glass-border); }
+        .border-custom { border-color: var(--border-color); }
         
         .brand-gradient {
-            background: linear-gradient(45deg, var(--accent-color), var(--accent-pink));
+            background: linear-gradient(45deg, var(--accent-color), #6366f1); /* Sesuai fahimna (cyan to indigo) */
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
         body, .main-card, button, .glass-card {
-            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Transisi lebih cepat */
         }
 
-        #background-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; }
+        #background-blobs { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1;
+            display: none; /* Nonaktifkan blob aurora */
+        }
         .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; }
         #blob1 { width: 400px; height: 400px; top: -15%; left: -15%; background: var(--accent-color); }
         #blob2 { width: 350px; height: 350px; bottom: -10%; right: -10%; background: var(--accent-pink); }
 
         .glass-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            background-color: var(--bg-secondary); /* Ganti dari glass-bg ke bg-secondary */
+            border: 1px solid var(--border-color); /* Ganti dari glass-border ke border-color */
+            /* backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); */ /* Hapus efek blur */
+        }
+        
+        /* Aturan khusus untuk header agar tetap blur */
+        header.glass-card {
+            background-color: var(--bg-header);
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--border-color);
         }
         
         .professional-badge {
             display: inline-flex; align-items: center; gap: 0.5rem; background-color: var(--bg-tertiary);
             color: var(--text-secondary); font-size: 0.75rem; font-weight: 500; padding: 0.25rem 0.75rem;
-            border-radius: 9999px; border: 1px solid var(--glass-border); transition: all 0.2s ease;
+            border-radius: 9999px; border: 1px solid var(--border-color); transition: background-color 0.2s ease;
         }
-        .professional-badge:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .professional-badge:hover { 
+            background-color: var(--border-color); /* Gunakan border-color untuk hover */
+            /* transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); */ /* Hapus transform/shadow */
+        }
+        .light-theme .professional-badge:hover {
+             background-color: var(--border-color);
+        }
 
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #48484A; border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: var(--scroll-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 10px; }
 
         #device-preview-container {
             transition: width 0.5s ease, height 0.5s ease, border-radius 0.5s ease, box-shadow 0.5s ease;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            overflow: hidden; border: 8px solid #000; background-color: var(--bg-primary);
+            overflow: hidden; 
+            border: 8px solid var(--bg-tertiary); /* Ubah border hitam menjadi bg-tertiary */
+            background-color: var(--bg-secondary); /* Ubah bg-primary menjadi bg-secondary (frame) */
         }
-        #content-container { overflow-y: auto; }
+        #content-container { 
+            overflow-y: auto; 
+            background-color: var(--bg-primary); /* Konten di dalam frame menggunakan bg-primary */
+        }
         /* Ini adalah kelas-kelas untuk mengubah mode perangkat */
         .pc-view { 
             width: 100%; 
@@ -128,13 +175,18 @@
         .collapsible-header.active .collapsible-icon { transform: rotate(180deg); }
 
         .feature-toggle { color: var(--text-secondary); background-color: var(--btn-secondary-bg); }
-        .feature-toggle.active { background-color: rgba(10, 132, 255, 0.2); color: var(--accent-color); }
-        .light-theme .feature-toggle.active { background-color: rgba(0, 122, 255, 0.1); }
+        .feature-toggle.active { 
+            background-color: var(--btn-feature-active-bg); 
+            color: var(--btn-feature-active-text); 
+        }
+        /* .light-theme .feature-toggle.active { background-color: rgba(0, 122, 255, 0.1); } */ /* Hapus, sudah ditangani variabel */
 
         .disclaimer-badge {
             background-color: var(--disclaimer-bg); border: 1px solid var(--disclaimer-border); color: var(--disclaimer-text);
             font-size: 0.75rem; border-radius: 0.5rem; padding: 0.75rem; display: flex; align-items: flex-start; gap: 0.75rem;
         }
+        .disclaimer-badge svg { color: var(--disclaimer-icon); }
+        .disclaimer-badge strong { color: var(--disclaimer-strong); }
         
         #sidebar-menu { transition: transform 0.3s ease-in-out; transform: translateX(100%); }
         #sidebar-overlay { transition: opacity 0.3s ease-in-out; opacity: 0; pointer-events: none; }
@@ -186,13 +238,25 @@
         .light-theme .flashcard-face::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); }
         
         .flashcard-front {
-            background-image: linear-gradient(45deg, var(--bg-tertiary), var(--glass-bg));
-            border: 1px solid var(--glass-border);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            background-color: var(--bg-tertiary); /* Hapus gradient, gunakan bg-tertiary */
+            border: 1px solid var(--border-color); /* Ganti glass-border */
+            /* box-shadow: inset 0 0 10px rgba(0,0,0,0.2); */ /* Hapus inset shadow */
         }
-        .flashcard-back {
-            background-image: linear-gradient(135deg, var(--accent-color), var(--accent-pink));
+        /* Mengganti .flashcard-back dengan .flashcard-face.flashcard-back untuk specificity */
+        .flashcard-face.flashcard-back {
+            /* background-image: linear-gradient(45deg, var(--accent-color), #6366f1); */ /* Dihapus */
+            background-color: var(--flashcard-back-bg); /* Warna baru, lebih gelap/terang dari depan */
             transform: rotateY(180deg);
+            color: var(--text-primary); /* Override 'text-white' dari JS */
+        }
+        /* Override warna tombol speaker di dalam backface */
+        .flashcard-face.flashcard-back .speaker-btn {
+            color: var(--text-primary);
+        }
+        /* Override warna <hr> di dalam backface */
+        .flashcard-face.flashcard-back hr {
+            border-color: var(--border-color);
+            opacity: 0.5;
         }
         .arabic-vocab { font-size: 2rem; line-height: 1.4; }
         .flashcard-back .arabic-vocab { font-size: 1.5rem; }
@@ -403,7 +467,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
-                        <p><strong>Penting:</strong> Hasil dari aplikasi ini dibuat oleh AI. Selalu lakukan pemeriksaan silang dengan ahli bahasa atau guru terpercaya.</p>
+                        <p><strong class="font-bold">Penting:</strong> Hasil dari aplikasi ini dibuat oleh AI. Selalu lakukan pemeriksaan silang dengan ahli bahasa atau guru terpercaya.</p>
                     </div>
                 </footer>
             </div>
@@ -1569,6 +1633,9 @@ Struktur output WAJIB dalam format JSON berikut. JANGAN tambahkan teks lain di l
 </script>
 </body>
 </html>
+
+
+
 
 
 
